@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <title>CTLX BEAMING</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
+  <style>
+
+    :root {
+
+      --bg: #05080f;
+
+      --card: #0c111d;
+
+      --neon-cyan: #00ffe1;
+
+      --neon-purple: #d500ff;
+
+      --neon-yellow: #fffd00;
+
+      --text: #f0faff;
+
+      --gray: #7a8ca8;
+
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+
+      font-family: 'Roboto', sans-serif;
+
+      background: var(--bg);
+
+      color: var(--text);
+
+      min-height: 100vh;
+
+      padding: 20px 15px;
+
+      overflow-x: hidden;
+
+      position: relative;
+
+    }
+
+    canvas#particles { position: fixed; top:0; left:0; width:100%; height:100%; z-index:-1; pointer-events:none; }
+
+    .container { max-width: 1000px; margin: 0 auto; position: relative; z-index:1; }
+
+    header {
+
+      text-align: center;
+
+      margin: 40px 0 50px;
+
+      animation: neonGlow 2s infinite alternate;
+
+    }
+
+    @keyframes neonGlow { 0% { text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-purple); } 100% { text-shadow: 0 0 20px var(--neon-cyan), 0 0 40px var(--neon-purple); } }
+
+    h1 {
+
+      font-family: 'Orbitron', sans-serif;
+
+      font-size: 3.2rem;
+
+      background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple), var(--neon-yellow));
+
+      -webkit-background-clip: text;
+
+      background-clip: text;
+
+      color: transparent;
+
+      letter-spacing: 5px;
+
+    }
+
+    .subtitle {
+
+      font-size: 1.4rem;
+
+      margin: 12px 0;
+
+      color: var(--gray);
+
+      animation: fadeIn 1.5s ease-out;
+
+    }
+
+    .emoji { font-size: 1.6em; vertical-align: middle; }
+
+    .services-grid {
+
+      display: grid;
+
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+
+      gap: 20px;
+
+      margin: 40px 0;
+
+    }
+
+    .service-card {
+
+      background: var(--card);
+
+      border: 2px solid var(--neon-cyan);
+
+      border-radius: 20px;
+
+      padding: 24px 12px;
+
+      text-align: center;
+
+      transition: all 0.5s ease;
+
+      box-shadow: 0 0 15px rgba(0,255,225,0.3);
+
+      cursor: pointer;
+
+      position: relative;
+
+    }
+
+    .service-card:hover {
+
+      transform: rotate(3deg) scale(1.1);
+
+      box-shadow: 0 0 30px rgba(0,255,225,0.6), 0 0 50px rgba(213,0,255,0.4);
+
+      animation: pulseGlow 1s infinite alternate;
+
+    }
+
+    @keyframes pulseGlow { 0% { box-shadow: 0 0 15px rgba(0,255,225,0.3); } 100% { box-shadow: 0 0 30px rgba(0,255,225,0.6); } }
+
+    .service-card.recommended { border-color: var(--neon-yellow); box-shadow: 0 0 20px rgba(255,253,0,0.5); }
+
+    .service-card div, .service-card a { color: var(--neon-cyan); text-decoration: none; font-weight: 500; font-size: 1.2rem; display: block; }
+
+    .discord-btn {
+
+      display: block;
+
+      width: max-content;
+
+      margin: 50px auto;
+
+      padding: 16px 40px;
+
+      background: linear-gradient(45deg, var(--neon-purple), var(--neon-cyan));
+
+      color: var(--bg);
+
+      font-size: 1.3rem;
+
+      font-weight: bold;
+
+      border-radius: 50px;
+
+      text-decoration: none;
+
+      box-shadow: 0 10px 30px rgba(213,0,255,0.5);
+
+      transition: all 0.4s;
+
+    }
+
+    .discord-btn:hover { transform: scale(1.1) rotate(-2deg); box-shadow: 0 20px 50px rgba(213,0,255,0.7); }
+
+    /* Secciones de servicios */
+
+    .section { 
+
+      background: var(--card);
+
+      border-radius: 25px;
+
+      padding: 35px;
+
+      margin: 40px auto;
+
+      max-width: 700px;
+
+      box-shadow: 0 0 40px rgba(0,255,225,0.2);
+
+      border: 1px solid var(--neon-cyan);
+
+      display: none;
+
+      animation: slideIn 0.8s ease-out;
+
+    }
+
+    @keyframes slideIn { from { opacity:0; transform: translateX(-50px); } to { opacity:1; transform: translateX(0); } }
+
+    .back-btn { 
+
+      display: inline-block; margin-bottom: 30px; color: var(--gray); text-decoration: none; font-size: 1.1rem; transition: all 0.3s; 
+
+    }
+
+    .back-btn:hover { color: var(--neon-yellow); text-shadow: 0 0 10px var(--neon-yellow); }
+
+    h2 { 
+
+      font-family: 'Orbitron', sans-serif; color: var(--neon-yellow); font-size: 2.8rem; text-align: center; margin-bottom: 35px; text-shadow: 0 0 20px var(--neon-yellow); 
+
+    }
+
+    .tabs { 
+
+      display: flex; margin: 25px 0; background: rgba(0,0,0,0.5); border-radius: 15px; overflow: hidden; 
+
+    }
+
+    .tab { 
+
+      flex: 1; padding: 16px; text-align: center; cursor: pointer; font-weight: 500; transition: all 0.4s; color: var(--text); 
+
+    }
+
+    .tab.active { background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple)); color: var(--bg); }
+
+    .form-group { margin: 25px 0; }
+
+    label { display: block; margin-bottom: 12px; color: var(--neon-cyan); font-weight: 500; text-shadow: 0 0 5px var(--neon-cyan); }
+
+    input, select { 
+
+      width: 100%; padding: 16px 18px; background: #080c15; border: 1px solid var(--neon-purple); border-radius: 12px; color: var(--text); font-size: 1rem; transition: all 0.3s; 
+
+    }
+
+    input:focus, select:focus { border-color: var(--neon-yellow); box-shadow: 0 0 15px var(--neon-yellow); }
+
+    .generate-btn { 
+
+      width: 100%; padding: 20px; background: linear-gradient(90deg, var(--neon-yellow), #ffaa00); color: var(--bg); font-size: 1.4rem; font-weight: bold; border: none; border-radius: 15px; cursor: pointer; margin-top: 25px; transition: all 0.4s; box-shadow: 0 0 20px var(--neon-yellow); 
+
+    }
+
+    .generate-btn:hover { transform: scale(1.05); box-shadow: 0 0 40px var(--neon-yellow); }
+
+    #result, #unshortenResult { margin-top: 30px; padding: 18px; background: rgba(0,255,225,0.1); border-radius: 12px; word-break: break-all; font-size: 1.1rem; box-shadow: 0 0 10px rgba(0,255,225,0.3); }
+
+    .copy-btn { margin-top: 15px; padding: 12px 25px; background: var(--neon-cyan); color: var(--bg); border: none; border-radius: 10px; cursor: pointer; font-weight: bold; transition: all 0.3s; }
+
+    .copy-btn:hover { box-shadow: 0 0 20px var(--neon-cyan); }
+
+    @media (max-width: 600px) { h1 { font-size: 2.4rem; } .services-grid { gap: 15px; } }
+
+  </style>
+
+</head>
+
+<body>
+
+  <canvas id="particles"></canvas>
+
+  <div class="container">
+
+    <header>
+
+      <h1>CTLX | BEAMING</h1>
+
+      <p class="subtitle"><span class="emoji">⚡</span> Professional URL Shortening & Hiding Service <span class="emoji">⚡</span></p>
+
+    </header>
+
+    <div class="services-grid" id="services">
+
+      <div class="service-card recommended" onclick="showSection('isgd')"><div>is.gd</div></div>
+
+      <div class="service-card" onclick="showSection('tinyurl')"><div>TinyURL</div></div>
+
+      <div class="service-card" onclick="showSection('vgd')"><div>v.gd</div></div>
+
+      <div class="service-card" onclick="showSection('spoo')"><div>spoo.me</div></div>
+
+      <div class="service-card"><a href="https://bit.ly" target="_blank">Bit.ly</a></div>
+
+      <div class="service-card"><a href="https://rebrand.ly" target="_blank">Rebrand.ly</a></div>
+
+      <div class="service-card"><a href="https://cutt.ly" target="_blank">Cutt.ly</a></div>
+
+      <div class="service-card"><a href="https://click.ly" target="_blank">click.ly</a></div>
+
+      <div class="service-card"><a href="https://tiny.cc" target="_blank">tiny.cc</a></div>
+
+      <div class="service-card"><a href="https://shorter.me" target="_blank">shorter.me</a></div>
+
+      <div class="service-card"><a href="https://shorter.gg" target="_blank">shorter.gg</a></div>
+
+      <div class="service-card"><a href="https://shorturl.asia" target="_blank">shorturl.asia</a></div>
+
+      <div class="service-card"><a href="https://reurl.cc" target="_blank">reurl.cc</a></div>
+
+      <div class="service-card"><a href="https://href.li" target="_blank">href.li</a></div>
+
+      <div class="service-card"><a href="https://hyperhost.ua" target="_blank">HyperHost</a></div>
+
+      <div class="service-card"><a href="https://l8.nu" target="_blank">l8.nu</a></div>
+
+      <div class="service-card"><a href="https://rb.gy" target="_blank">rb.gy</a></div>
+
+      <div class="service-card"><a href="https://t2m.io" target="_blank">t2m.io</a></div>
+
+      <div class="service-card"><a href="https://clck.ru" target="_blank">clck.ru</a></div>
+
+      <div class="service-card"><a href="https://short.io" target="_blank">short.io</a></div>
+
+      <div class="service-card"><a href="https://kurze.links" target="_blank">kurze.links</a></div>
+
+    </div>
+
+    <a href="https://discord.gg/us5FFdZcnx" target="_blank" class="discord-btn"><span class="emoji">🎮</span> Join Discord Community</a>
+
+    <!-- Sección is.gd -->
+
+    <div class="section" id="isgd">
+
+      <a href="#" class="back-btn" onclick="showServices()">← Back to Services</a>
+
+      <h2>is.gd</h2>
+
+      <div class="tabs">
+
+        <div class="tab active" onclick="switchTab('shorten', 'isgd')">Shorten URL</div>
+
+        <div class="tab" onclick="switchTab('unshorten', 'isgd')">Unshorten URL</div>
+
+      </div>
+
+      <div id="isgd-shorten">
+
+        <div class="form-group">
+
+          <label><span class="emoji">🎮</span> Select Link Type</label>
+
+          <select id="isgd-linkType" onchange="updatePlaceholder('isgd')">
+
+            <option value="private">Private Server</option>
+
+            <option value="profile">Profile</option>
+
+            <option value="group">Group</option>
+
+            <option value="any">Any Link</option>
+
+          </select>
+
+        </div>
+
+        <div class="form-group">
+
+          <label><span class="emoji">🔗</span> Enter Your Link</label>
+
+          <input type="url" id="isgd-longUrl" placeholder="https://www.roblox.com/users/123/profile" required>
+
+        </div>
+
+        <div class="form-group">
+
+          <label><span class="emoji">✨</span> Custom Slug (Optional)</label>
+
+          <input type="text" id="isgd-customSlug" placeholder="your-custom-slug">
+
+        </div>
+
+        <p style="color:var(--gray); font-size:0.95rem; margin:15px 0;">Your link will be: <strong>https://is.gd/your-code</strong></p>
+
+        <button class="generate-btn" onclick="shortenUrl('isgd')">Generate Hidden Link ⚡</button>
+
+        <div id="isgd-result"></div>
+
+        <button class="copy-btn" id="isgd-copyBtn" style="display:none;" onclick="copyResult('isgd')">Copy Link</button>
+
+      </div>
+
+      <div id="isgd-unshorten" style="display:none;">
+
+        <div class="form-group">
+
+          <label><span class="emoji">🔍</span> Enter Shortened URL</label>
+
+          <input type="url" id="isgd-shortUrl" placeholder="https://is.gd/abc123" required>
+
+        </div>
+
+        <button class="generate-btn" onclick="unshortenUrl('isgd')">Reveal Original URL</button>
+
+        <div id="isgd-unshortenResult"></div>
+
+      </div>
+
+    </div>
+
+    <!-- Sección TinyURL -->
+
+    <div class="section" id="tinyurl">
+
+      <a href="#" class="back-btn" onclick="showServices()">← Back to Services</a>
+
+      <h2>TinyURL</h2>
+
+      <div class="tabs">
+
+        <div class="tab active" onclick="switchTab('shorten', 'tinyurl')">Shorten URL</div>
+
+        <div class="tab" onclick="switchTab('unshorten', 'tinyurl')">Unshorten URL</div>
+
+      </div>
+
+      <div id="tinyurl-shorten">
+
+        <div class="form-group">
+
+          <label><span class="emoji">🎮</span> Select Link Type</label>
+
+          <select id="tinyurl-linkType" onchange="updatePlaceholder('tinyurl')">
+
+            <option value="private">Private Server</option>
+
+            <option value="profile">Profile</option>
+
+            <option value="group">Group</option>
+
+            <option value="any">Any Link</option>
+
+          </select>
+
+        </div>
+
+        <div class="form-group">
+
+          <label><span class="emoji">🔗</span> Enter Your Link</label>
+
+          <input type="url" id="tinyurl-longUrl" placeholder="https://www.roblox.com/users/123/profile" required>
+
+        </div>
+
+        <p style="color:var(--gray); font-size:0.95rem; margin:15px 0;">Your link will be: <strong>https://tinyurl.com/your-code</strong></p>
+
+        <button class="generate-btn" onclick="shortenUrl('tinyurl')">Generate Hidden Link ⚡</button>
+
+        <div id="tinyurl-result"></div>
+
+        <button class="copy-btn" id="tinyurl-copyBtn" style="display:none;" onclick="copyResult('tinyurl')">Copy Link</button>
+
+      </div>
+
+      <div id="tinyurl-unshorten" style="display:none;">
+
+        <div class="form-group">
+
+          <label><span class="emoji">🔍</span> Enter Shortened URL</label>
+
+          <input type="url" id="tinyurl-shortUrl" placeholder="https://tinyurl.com/abc123" required>
+
+        </div>
+
+        <button class="generate-btn" onclick="unshortenUrl('tinyurl')">Reveal Original URL</button>
+
+        <div id="tinyurl-unshortenResult"></div>
+
+      </div>
+
+    </div>
+
+    <!-- Sección v.gd -->
+
+    <div class="section" id="vgd">
+
+      <a href="#" class="back-btn" onclick="showServices()">← Back to Services</a>
+
+      <h2>v.gd</h2>
+
+      <div class="tabs">
+
+        <div class="tab active" onclick="switchTab('shorten', 'vgd')">Shorten URL</div>
+
+        <div class="tab" onclick="switchTab('unshorten', 'vgd')">Unshorten URL</div>
+
+      </div>
+
+      <div id="vgd-shorten">
+
+        <div class="form-group">
+
+          <label><span class="emoji">🎮</span> Select Link Type</label>
+
+          <select id="vgd-linkType" onchange="updatePlaceholder('vgd')">
+
+            <option value="private">Private Server</option>
+
+            <option value="profile">Profile</option>
+
+            <option value="group">Group</option>
+
+            <option value="any">Any Link</option>
+
+          </select>
+
+        </div>
+
+        <div class="form-group">
+
+          <label><span class="emoji">🔗</span> Enter Your Link</label>
+
+          <input type="url" id="vgd-longUrl" placeholder="https://www.roblox.com/users/123/profile" required>
+
+        </div>
+
+        <div class="form-group">
+
+          <label><span class="emoji">✨</span> Custom Slug (Optional)</label>
+
+          <input type="text" id="vgd-customSlug" placeholder="your-custom-slug">
+
+        </div>
+
+        <p style="color:var(--gray); font-size:0.95rem; margin:15px 0;">Your link will be: <strong>https://v.gd/your-code</strong></p>
+
+        <button class="generate-btn" onclick="shortenUrl('vgd')">Generate Hidden Link ⚡</button>
+
+        <div id="vgd-result"></div>
+
+        <button class="copy-btn" id="vgd-copyBtn" style="display:none;" onclick="copyResult('vgd')">Copy Link</button>
+
+      </div>
+
+      <div id="vgd-unshorten" style="display:none;">
+
+        <div class="form-group">
+
+          <label><span class="emoji">🔍</span> Enter Shortened URL</label>
+
+          <input type="url" id="vgd-shortUrl" placeholder="https://v.gd/abc123" required>
+
+        </div>
+
+        <button class="generate-btn" onclick="unshortenUrl('vgd')">Reveal Original URL</button>
+
+        <div id="vgd-unshortenResult"></div>
+
+      </div>
+
+    </div>
+
+    <!-- Sección spoo.me -->
+
+    <div class="section" id="spoo">
+
+      <a href="#" class="back-btn" onclick="showServices()">← Back to Services</a>
+
+      <h2>spoo.me</h2>
+
+      <div class="tabs">
+
+        <div class="tab active" onclick="switchTab('shorten', 'spoo')">Shorten URL</div>
+
+        <div class="tab" onclick="switchTab('unshorten', 'spoo')">Unshorten URL</div>
+
+      </div>
+
+      <div id="spoo-shorten">
+
+        <div class="form-group">
+
+          <label><span class="emoji">🎮</span> Select Link Type</label>
+
+          <select id="spoo-linkType" onchange="updatePlaceholder('spoo')">
+
+            <option value="private">Private Server</option>
+
+            <option value="profile">Profile</option>
+
+            <option value="group">Group</option>
+
+            <option value="any">Any Link</option>
+
+          </select>
+
+        </div>
+
+        <div class="form-group">
+
+          <label><span class="emoji">🔗</span> Enter Your Link</label>
+
+          <input type="url" id="spoo-longUrl" placeholder="https://www.roblox.com/users/123/profile" required>
+
+        </div>
+
+        <div class="form-group">
+
+          <label><span class="emoji">✨</span> Custom Alias (Optional)</label>
+
+          <input type="text" id="spoo-customAlias" placeholder="your-custom-alias">
+
+        </div>
+
+        <p style="color:var(--gray); font-size:0.95rem; margin:15px 0;">Your link will be: <strong>https://spoo.me/your-code</strong></p>
+
+        <button class="generate-btn" onclick="shortenUrl('spoo')">Generate Hidden Link ⚡</button>
+
+        <div id="spoo-result"></div>
+
+        <button class="copy-btn" id="spoo-copyBtn" style="display:none;" onclick="copyResult('spoo')">Copy Link</button>
+
+      </div>
+
+      <div id="spoo-unshorten" style="display:none;">
+
+        <div class="form-group">
+
+          <label><span class="emoji">🔍</span> Enter Shortened URL</label>
+
+          <input type="url" id="spoo-shortUrl" placeholder="https://spoo.me/abc123" required>
+
+        </div>
+
+        <button class="generate-btn" onclick="unshortenUrl('spoo')">Reveal Original URL</button>
+
+        <div id="spoo-unshortenResult"></div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+
+    // Partículas de fondo
+
+    const canvas = document.getElementById('particles');
+
+    const ctx = canvas.getContext('2d');
+
+    canvas.width = window.innerWidth;
+
+    canvas.height = window.innerHeight;
+
+    let particles = [];
+
+    class Particle {
+
+      constructor() {
+
+        this.x = Math.random() * canvas.width;
+
+        this.y = Math.random() * canvas.height;
+
+        this.size = Math.random() * 3 + 1;
+
+        this.speed = Math.random() * 0.5 + 0.1;
+
+        this.color = `rgba(0,255,225,${Math.random()*0.5 + 0.2})`;
+
+      }
+
+      update() { this.y += this.speed; if (this.y > canvas.height) this.y = 0; }
+
+      draw() { ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); ctx.fillStyle = this.color; ctx.fill(); }
+
+    }
+
+    for (let i=0; i<100; i++) particles.push(new Particle());
+
+    function animateParticles() {
+
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+
+      particles.forEach(p => { p.update(); p.draw(); });
+
+      requestAnimationFrame(animateParticles);
+
+    }
+
+    animateParticles();
+
+    window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+
+    // Funciones generales
+
+    function showSection(id) {
+
+      document.getElementById('services').style.display = 'none';
+
+      document.getElementById(id).style.display = 'block';
+
+      switchTab('shorten', id); // Default to shorten
+
+    }
+
+    function showServices() {
+
+      document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+
+      document.getElementById('services').style.display = 'grid';
+
+    }
+
+    function switchTab(tab, service) {
+
+      document.querySelectorAll(`#${service} .tab`).forEach(t => t.classList.remove('active'));
+
+      event.target.classList.add('active');
+
+      document.getElementById(`${service}-shorten`).style.display = tab === 'shorten' ? 'block' : 'none';
+
+      document.getElementById(`${service}-unshorten`).style.display = tab === 'unshorten' ? 'block' : 'none';
+
+    }
+
+    function updatePlaceholder(service) {
+
+      const type = document.getElementById(`${service}-linkType`).value;
+
+      const input = document.getElementById(`${service}-longUrl`);
+
+      if (type === 'profile') input.placeholder = 'https://www.roblox.com/users/123/profile';
+
+      else if (type === 'group') input.placeholder = 'https://www.roblox.com/groups/123/group-name';
+
+      else if (type === 'private') input.placeholder = 'https://www.roblox.com/games/123/private-server';
+
+      else input.placeholder = 'https://example.com/any-link';
+
+    }
+
+    async function shortenUrl(service) {
+
+      const longUrl = document.getElementById(`${service}-longUrl`).value.trim();
+
+      const type = document.getElementById(`${service}-linkType`).value;
+
+      const resultDiv = document.getElementById(`${service}-result`);
+
+      const copyBtn = document.getElementById(`${service}-copyBtn`);
+
+      let custom = '';
+
+      if (!longUrl) return resultDiv.innerHTML = '<span style="color:#ff5555;">Enter a valid URL!</span>';
+
+      // Validación basada en tipo
+
+      if (type === 'profile' && !longUrl.includes('/users/')) return resultDiv.innerHTML = '<span style="color:#ff5555;">Invalid Profile link!</span>';
+
+      if (type === 'group' && !longUrl.includes('/groups/')) return resultDiv.innerHTML = '<span style="color:#ff5555;">Invalid Group link!</span>';
+
+      if (type === 'private' && !longUrl.includes('/games/')) return resultDiv.innerHTML = '<span style="color:#ff5555;">Invalid Private Server link!</span>';
+
+      resultDiv.innerHTML = 'Shortening...';
+
+      copyBtn.style.display = 'none';
+
+      const proxy = 'https://cors-anywhere.herokuapp.com/'; // Proxy para resolver CORS
+
+      try {
+
+        let url, method = 'GET', body = null, headers = {};
+
+        if (service === 'isgd' || service === 'vgd') {
+
+          custom = document.getElementById(`${service}-customSlug`).value.trim();
+
+          const base = service === 'isgd' ? 'is.gd' : 'v.gd';
+
+          url = proxy + `https://${base}/create.php?format=simple&url=${encodeURIComponent(longUrl)}`;
+
+          if (custom) url += `&shorturl=${encodeURIComponent(custom)}`;
+
+        } else if (service === 'tinyurl') {
+
+          url = `https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`; // No proxy, ya que funciona
+
+        } else if (service === 'spoo') {
+
+          custom = document.getElementById('spoo-customAlias').value.trim();
+
+          url = proxy + 'https://spoo.me/shorten';
+
+          method = 'POST';
+
+          body = JSON.stringify({ url: longUrl, alias: custom || undefined });
+
+          headers = { 'Content-Type': 'application/json' };
+
+        }
+
+        const res = await fetch(url, { method, body, headers });
+
+        if (!res.ok) {
+
+          const errText = await res.text();
+
+          throw new Error(`HTTP error ${res.status}: ${errText}`);
+
+        }
+
+        let text;
+
+        if (service === 'spoo') {
+
+          const json = await res.json();
+
+          text = json.short_url;
+
+        } else {
+
+          text = await res.text();
+
+        }
+
+        if (text.startsWith('http')) {
+
+          resultDiv.innerHTML = `<strong>Short link:</strong> <a href="${text}" target="_blank" style="color:var(--neon-cyan);">${text}</a>`;
+
+          window[`${service}Shortened`] = text;
+
+          copyBtn.style.display = 'inline-block';
+
+          confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } }); // Animación de éxito
+
+        } else {
+
+          resultDiv.innerHTML = `<span style="color:#ff5555;">Error: ${text}</span>`;
+
+        }
+
+      } catch (err) {
+
+        resultDiv.innerHTML = `<span style="color:#ff5555;">Failed to shorten: ${err.message}</span>`;
+
+        console.error(err);
+
+      }
+
+    }
+
+    async function unshortenUrl(service) {
+
+      const short = document.getElementById(`${service}-shortUrl`).value.trim();
+
+      const resultDiv = document.getElementById(`${service}-unshortenResult`);
+
+      if (!short) return resultDiv.innerHTML = '<span style="color:#ff5555;">Enter a valid short URL!</span>';
+
+      resultDiv.innerHTML = 'Resolving...';
+
+      const proxy = 'https://cors-anywhere.herokuapp.com/';
+
+      try {
+
+        let original;
+
+        if (service === 'isgd' || service === 'vgd') {
+
+          const base = service === 'isgd' ? 'is.gd' : 'v.gd';
+
+          const code = short.split('/').pop();
+
+          const res = await fetch(proxy + `https://${base}/forward.php?format=simple&shorturl=${code}`);
+
+          if (!res.ok) throw new Error(await res.text());
+
+          original = await res.text();
+
+        } else {
+
+          const res = await fetch(proxy + short, { method: 'HEAD' });
+
+          original = res.redirected ? res.url : 'Could not resolve';
+
+        }
+
+        if (original.startsWith('http')) {
+
+          resultDiv.innerHTML = `<strong>Original:</strong> <a href="${original}" target="_blank" style="color:var(--neon-cyan);">${original}</a>`;
+
+        } else {
+
+          resultDiv.innerHTML = `<span style="color:#ff5555;">Error: ${original || 'Not found'}</span>`;
+
+        }
+
+      } catch (err) {
+
+        resultDiv.innerHTML = `<span style="color:#ff5555;">Failed to resolve: ${err.message}</span>`;
+
+      }
+
+    }
+
+    function copyResult(service) {
+
+      const link = window[`${service}Shortened`];
+
+      if (link) navigator.clipboard.writeText(link).then(() => alert('Link copied!'));
+
+    }
+
+  </script>
+
+</body>
+
+</html>
